@@ -22,21 +22,21 @@ class Pymarket(object):
         if message.split()[0] == "PING":
             self.send("PONG %s\r\n" % message.split()[1])
         else:
-            keys = ['sender', 'command', 'target', 'message']
+            keys = ['sender', 'type', 'target', 'message']
             self.args = dict((key, value.lstrip(':')) for key, value in zip(keys, message.split()))
-            self.args['sender'] = self.args['sender'][0:self.args['sender'].index('!')]
+            self.args['sender'] = self.args['sender'][0:4]
 
-            if self.args['command'] == "PRIVMSG":
+            if self.args['type'] == "PRIVMSG":
                 self.message()
-            elif self.args['command'] == "JOIN":
+            elif self.args['type'] == "JOIN":
                 self.join()
-            elif self.args['command'] == "QUIT":
+            elif self.args['type'] == "QUIT":
                 self.leave()
-            elif self.args['command'] == "PART":
+            elif self.args['type'] == "PART":
                 self.leave()
-            elif self.args['command'] == "KICK":
+            elif self.args['type'] == "KICK":
                 self.leave()
-            elif self.args['command'] == "KILL":
+            elif self.args['type'] == "KILL":
                 self.leave()
 
     def message(self):
