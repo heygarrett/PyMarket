@@ -20,24 +20,30 @@ class Pymarket(object):
 
     def parse_message(self, message):
         if message.split()[0] == "PING":
+            print("Ping!")
             self.send("PONG %s\r\n" % message.split()[1])
-        else:
-            keys = ['sender', 'type', 'target', 'message']
-            self.args = dict((key, value.lstrip(':')) for key, value in zip(keys, message.split()))
-            self.args['sender'] = self.args['sender'][0:self.args['sender'].index('!')]
-
+            print("Pong!")
+        elif message[0] == ':':
+            message = message.lstrip(':')
+            keys = ['sender', 'type', 'target']
+            self.args = dict((key, value) for key, value in zip(keys, message.split()))
+            if '!' in self.args['sender']:
+                self.args['sender'] = self.args['sender'][0:self.args['sender'].index('!')]
             if self.args['type'] == "PRIVMSG":
-                self.message()
-            elif self.args['type'] == "JOIN":
-                self.join()
-            elif self.args['type'] == "QUIT":
-                self.leave()
-            elif self.args['type'] == "PART":
-                self.leave()
-            elif self.args['type'] == "KICK":
-                self.leave()
-            elif self.args['type'] == "KILL":
-                self.leave()
+                self.args['message'] = message[message.index(':') + 1:-1]
+
+            self.options = {
+                    "PRIVMSG": self.message,
+                    "JOIN": self.join,
+                    "QUIT": self.leave,
+                    "PART": self.leave,
+                    "KICK": self.leave,
+                    "KILL": self.leave
+            }
+
+            self.choice = self.options.get(self.args['type'])
+            if self.choice:
+                self.choice()
 
     def message(self):
         print("%s: %s" % (self.args['sender'], self.args['message']))
@@ -46,10 +52,10 @@ class Pymarket(object):
         print("%s joined %s" % (self.args['sender'], self.args['target']))
 
     def leave(self):
-        print("%s left %s" % (self.args['sender'], self.args['target']))
+        print("%s left" % self.args['sender'])
 
 def main():
-    client = Pymarket("irc.freenode.net", 6667, "pymarket", "#learnprogramming")
+    client = Pymarket("irc.freenode.net", 6667, "PyMarket", "#gyaretto")
     client.connect()
     while True:
         server_message = client.irc.recv(4096).decode()
