@@ -1,7 +1,0 @@
-:Trophic!3cf11af1@gateway/web/freenode/ip.60.241.26.241 JOIN #learnprogramming
-
-:darkf!~darkf___@unaffiliated/darkf PRIVMSG #learnprogramming :se5a: is it just some programming language?
-
-PING :morgan.freenode.net
-
-:Trophic!3cf11af1@gateway/web/freenode/ip.60.241.26.241 QUIT :Client Quit
