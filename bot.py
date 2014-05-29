@@ -19,18 +19,18 @@ class Pymarket(object):
         self.send("JOIN %s\r\n" % self.channel)
 
     def parse_message(self, message):
-        if message.split()[0] == "PING":
+        self.words = message.split(':')
+        if self.words[0] == "PING":
             print("Ping!")
-            self.send("PONG %s\r\n" % message.split()[1])
+            self.send("PONG :%s\r\n" % self.words[1])
             print("Pong!")
-        elif message[0] == ':':
-            message = message.lstrip(':')
+        elif self.words[0] == '':
             keys = ['sender', 'type', 'target']
-            self.args = dict((key, value) for key, value in zip(keys, message.split()))
+            self.args = dict((key, value) for key, value in zip(keys, self.words[1].split()))
             if '!' in self.args['sender']:
                 self.args['sender'] = self.args['sender'][0:self.args['sender'].index('!')]
             if self.args['type'] == "PRIVMSG":
-                self.args['message'] = message[message.index(':') + 1:-1]
+                self.args['message'] = ':'.join(self.words[4:-1])
 
             self.options = {
                     "PRIVMSG": self.message,
@@ -38,7 +38,8 @@ class Pymarket(object):
                     "QUIT": self.leave,
                     "PART": self.leave,
                     "KICK": self.leave,
-                    "KILL": self.leave
+                    "KILL": self.leave,
+                    "353": self.names
             }
 
             self.choice = self.options.get(self.args['type'])
@@ -53,6 +54,11 @@ class Pymarket(object):
 
     def leave(self):
         print("%s left" % self.args['sender'])
+        
+    def names(self):
+        c = re.compile('[^\\w -]')
+        nicks = c.sub('', self.words[2]).split()
+        print(nicks)
 
 def main():
     client = Pymarket("irc.freenode.net", 6667, "PyMarket", "#gyaretto")
