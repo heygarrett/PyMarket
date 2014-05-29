@@ -24,7 +24,7 @@ class Pymarket(object):
         else:
             keys = ['sender', 'type', 'target', 'message']
             self.args = dict((key, value.lstrip(':')) for key, value in zip(keys, message.split()))
-            self.args['sender'] = self.args['sender'][0:4]
+            self.args['sender'] = self.args['sender'][0:self.args['sender'].index('!')]
 
             if self.args['type'] == "PRIVMSG":
                 self.message()
