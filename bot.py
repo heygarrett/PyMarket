@@ -18,53 +18,56 @@ class Pymarket(object):
         }
 
     def send(self, data):
-        self.irc.send(data.encode())
+        line = data + '\r\n'
+        self.irc.send(line.encode())
 
     def connect(self):
         self.irc = socket.socket()
         self.irc.connect((self.host, self.port))
-        self.send('NICK %s\r\n' % self.name)
-        self.send('USER %s %d %s :%s\r\n' % (self.name, 8, '*', self.name))
-        self.send('JOIN %s\r\n' % self.channel)
+        self.send('NICK %s' % self.name)
+        self.send('USER %s %d %s :%s' % (self.name, 8, '*', self.name))
+        self.send('JOIN %s' % self.channel)
 
-    def parse_message(self, message):
-        self.sections = message.split(':')
-        if self.sections[0] == '':
+    def parse_message(self, line):
+        sections = line.split(':')
+        if sections[0] == '':
             keys = ['sender', 'type', 'target']
-            self.args = dict((key, value) for key, value in zip(keys, self.sections[1].split()))
-            if '!' in self.args['sender']:
-                self.args['sender'] = self.args['sender'][0:self.args['sender'].index('!')]
-            if self.args['type'] == 'PRIVMSG':
-                self.args['message'] = ':'.join(self.sections[2:])
+            sm = dict((key, value) for key, value in zip(keys, sections[1].split()))
+            if '!' in sm['sender']:
+                sm['sender'] = sm['sender'][0:sm['sender'].index('!')]
+            if sm['type'] == 'PRIVMSG':
+                sm['text'] = ':'.join(sections[2:])
+            if sm['type'] == '353':
+                c = re.compile('[^\\w -]')
+                sm['nicks'] = c.sub('', sections[2]).split()
 
-            choice = self.options.get(self.args['type'])
+            choice = self.options.get(sm['type'])
             if choice:
-               choice()
-        elif self.sections[0] == 'PING':
+               choice(sm)
+               
+        elif sections[0] == 'PING':
             print('Ping!')
-            self.send('PONG :%s\r\n' % self.sections[1])
+            self.send('PONG :%s\r\n' % sections[1])
             print('Pong!')
 
-    def message(self):
-        print('%s: %s' % (self.args['sender'], self.args['message']))
+    def message(self, args):
+        print('%s: %s' % (args['sender'], args['text']))
 
-    def join(self):
-        print('%s joined %s' % (self.args['sender'], self.args['target']))
+    def join(self, args):
+        print('%s joined %s' % (args['sender'], args['target']))
 
-    def leave(self):
-        print('%s left' % self.args['sender'])
+    def leave(self, args):
+        print('%s left' % args['sender'])
         
-    def names(self):
-        c = re.compile('[^\\w -]')
-        nicks = c.sub('', self.sections[2]).split()
-        print(nicks)
+    def names(self, args):
+        nicks = args['nicks']
 
 def main():
     client = Pymarket('irc.freenode.net', 6667, 'PyMarket', '#gyaretto')
     client.connect()
     while True:
-        server_message = client.irc.recv(4096).decode()
-        client.parse_message(server_message)
+        line = client.irc.recv(4096).decode()
+        client.parse_message(line)
 
 if __name__ == '__main__':
     main()
