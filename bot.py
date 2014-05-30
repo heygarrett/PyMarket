@@ -7,6 +7,7 @@ class Pymarket(object):
         self.port = port
         self.name = name
         self.channel = channel
+        self.users = []
         self.options = {
                 'PRIVMSG': self.message,
                 'JOIN': self.join,
@@ -32,35 +33,36 @@ class Pymarket(object):
         sections = line.split(':')
         if sections[0] == '':
             keys = ['sender', 'type', 'target']
-            sm = dict((key, value) for key, value in zip(keys, sections[1].split()))
-            if '!' in sm['sender']:
-                sm['sender'] = sm['sender'][0:sm['sender'].index('!')]
-            if sm['type'] == 'PRIVMSG':
-                sm['text'] = ':'.join(sections[2:])
-            if sm['type'] == '353':
+            serv_message = dict((key, value) for key, value in zip(keys, sections[1].split()))
+            if '!' in serv_message['sender']:
+                serv_message['sender'] = serv_message['sender'][0:serv_message['sender'].index('!')]
+            if serv_message['type'] == 'PRIVMSG':
+                serv_message['text'] = ':'.join(sections[2:])
+            if serv_message['type'] == '353':
                 c = re.compile('[^\\w -]')
-                sm['nicks'] = c.sub('', sections[2]).split()
+                serv_message['nicks'] = c.sub('', sections[2]).split()
 
-            choice = self.options.get(sm['type'])
+            choice = self.options.get(serv_message['type'])
             if choice:
-               choice(sm)
+               choice(serv_message)
                
         elif sections[0] == 'PING':
-            print('Ping!')
             self.send('PONG :%s\r\n' % sections[1])
-            print('Pong!')
 
-    def message(self, args):
-        print('%s: %s' % (args['sender'], args['text']))
+    def message(self, sm):
+        print('%s: %s' % (sm['sender'], sm['text']))
 
-    def join(self, args):
-        print('%s joined %s' % (args['sender'], args['target']))
+    def join(self, sm):
+        self.users.append(sm['sender'])
+        print('%s joined %s' % (sm['sender'], sm['target']))
 
-    def leave(self, args):
-        print('%s left' % args['sender'])
+    def leave(self, sm):
+        self.users.remove(sm['sender'])
+        print('%s left' % sm['sender'])
         
-    def names(self, args):
-        nicks = args['nicks']
+    def names(self, sm):
+        nicks = sm['nicks']
+        self.users = self.users + nicks
 
 def main():
     client = Pymarket('irc.freenode.net', 6667, 'PyMarket', '#gyaretto')
