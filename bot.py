@@ -53,13 +53,18 @@ class Pymarket(object):
         nick = sm['sender']
         text = sm['text'].split()
 
-        for i in self.users:
-            if text[0].index(i) == 0:
-                receiver = i
+        for user in self.users:
+            if user in text[0] and text[0].index(user) == 0:
+                receiver = user
+                print('receiver:', receiver)
+                suffix = text[0].replace(user, '')
+                credits = rg.match('^\\+=(\\d+)?$', suffix).group(1)
+                print('credits:', credits)
                 break
 
-        if text[0][len(receiver):] == '++':
-            db.transfer(nick, receiver, 1)
+        if receiver and credits:
+            db.transfer(nick, receiver, credits)
+            self.send('Credits transferred from', nick, 'to', receiver, ':', credits)
 
     def join(self, sm):
         self.users.append(sm['sender'])
@@ -71,6 +76,7 @@ class Pymarket(object):
         
     def names(self, sm):
         self.users += sm['nicks']
+        print(self.users)
         for i in self.users:
             if not db.checkBal(i):
                 db.addAcc(i)
@@ -78,9 +84,14 @@ class Pymarket(object):
 def main():
     client = Pymarket('irc.freenode.net', 6667, 'PyMarket', '#gyaretto')
     client.connect()
+    buf = ''
     while True:
-        line = client.irc.recv(4096).decode()
-        client.parse_message(line)
+        buf += client.irc.recv(4096).decode()
+        if '\r\n' in buf:
+            line = buf[:buf.index('\r\n')]
+            buf = buf[buf.index('\r\n') + 1:]
+            client.parse_message(line)
+            print(line)
 
 if __name__ == '__main__':
     main()
