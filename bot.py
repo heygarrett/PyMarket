@@ -1,4 +1,4 @@
-import socket, re
+import socket, re, db
 
 class Pymarket(object):
 
@@ -50,7 +50,16 @@ class Pymarket(object):
             self.send('PONG :%s\r\n' % sections[1])
 
     def message(self, sm):
-        print('%s: %s' % (sm['sender'], sm['text']))
+        nick = sm['sender']
+        text = sm['text'].split()
+
+        for i in self.users:
+            if text[0].index(i) == 0:
+                receiver = i
+                break
+
+        if text[0][len(receiver):] == '++':
+            db.transfer(nick, receiver, 1)
 
     def join(self, sm):
         self.users.append(sm['sender'])
@@ -61,7 +70,10 @@ class Pymarket(object):
         print('%s left' % sm['sender'])
         
     def names(self, sm):
-        self.users = self.users + sm['nicks']
+        self.users += sm['nicks']
+        for i in self.users:
+            if not db.checkBal(i):
+                db.addAcc(i)
 
 def main():
     client = Pymarket('irc.freenode.net', 6667, 'PyMarket', '#gyaretto')
