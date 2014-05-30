@@ -18,16 +18,16 @@ class Pymarket(object):
                 '353': self.names
         }
 
-    def send(self, data):
-        line = data + '\r\n'
+    def send(self, *data):
+        line = ' '.join(data) + '\r\n'
         self.irc.send(line.encode())
 
     def connect(self):
         self.irc = socket.socket()
         self.irc.connect((self.host, self.port))
-        self.send('NICK %s' % self.name)
-        self.send('USER %s %d %s :%s' % (self.name, 8, '*', self.name))
-        self.send('JOIN %s' % self.channel)
+        self.send('NICK', self.name)
+        self.send('USER', self.name, '8', '*', self.name)
+        self.send('JOIN', self.channel)
 
     def parse_message(self, line):
         sections = line.split(':')
@@ -42,7 +42,7 @@ class Pymarket(object):
                 c = re.compile('[^\\w -]')
                 serv_message['nicks'] = c.sub('', sections[2]).split()
 
-            choice = self.options.get(serv_message['type'])
+            choice = self.handlers.get(serv_message['type'])
             if choice:
                choice(serv_message)
                
