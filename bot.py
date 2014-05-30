@@ -8,7 +8,7 @@ class Pymarket(object):
         self.name = name
         self.channel = channel
         self.users = []
-        self.options = {
+        self.handlers = {
                 'PRIVMSG': self.message,
                 'JOIN': self.join,
                 'QUIT': self.leave,
@@ -61,8 +61,7 @@ class Pymarket(object):
         print('%s left' % sm['sender'])
         
     def names(self, sm):
-        nicks = sm['nicks']
-        self.users = self.users + nicks
+        self.users = self.users + sm['nicks']
 
 def main():
     client = Pymarket('irc.freenode.net', 6667, 'PyMarket', '#gyaretto')
