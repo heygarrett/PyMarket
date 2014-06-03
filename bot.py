@@ -40,15 +40,15 @@ class Pymarket:
             nick, credits = command.split('+=', 1)
             try:
                 credits = int(credits)
-            except:
-                credits = False
-            if nick in self.users and credits > 0:
-                success = db.transfer(values['nick'], nick, credits)
-                if success:
-                    self.irc.send('PRIVMSG', values['target'], ':Credits transferred from', \
-                            values['nick'], 'to', nick + ':', str(credits))
-                else:
-                    self.irc.send('PRIVMSG', values['target'], ':' + values['nick'], ': Not enough credits')
+                if nick in self.users and credits > 0:
+                    success = db.transfer(values['nick'], nick, credits)
+                    if success:
+                        self.irc.send('PRIVMSG', values['target'], ':Credits transferred from', \
+                                values['nick'], 'to', nick + ':', str(credits))
+                    else:
+                        self.irc.send('PRIVMSG', values['target'], ':' + values['nick'], ': Not enough credits')
+            except ValueError:
+               print('Credits not a number.')
         print(values['nick'] + ': ' + values['text'])
 
     def notice(self, values):
