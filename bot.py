@@ -20,13 +20,15 @@ class Pymarket:
         if line[0] == ':' and '!' in line:
             prefix, line = line[1:].split(' ', 1)
             values['nick'] = prefix.split('!')[0]
-            values['command'], values['target'], line = line.split(' ', 2)
+            values['command'], line = line.split(' ', 1)
         if ' :' in line:
-            values['text'] = line.split(' :')
-        if len(values) == 4:
+            values['target'], values['text'] = line.split(' :', 1)
+        if len(values) >= 3:
             choice = self.handlers.get(values['command'])
             if choice:
                 choice(values)
+        if line.split()[0] == 'PING':
+            self.irc.send('PONG', line.split()[1])
 
     def message(self, values):
         print(values['nick'] + ': ' + values['text'])
@@ -53,8 +55,9 @@ def main():
     while True:
         line = connection.receive()
         if line:
-            print(line)
-            bot.parse_message(line)
+            for text in line:
+                print(text)
+                bot.parse_message(text)
 
 if __name__ == "__main__":
     main()
