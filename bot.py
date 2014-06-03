@@ -48,7 +48,7 @@ class Pymarket:
                     self.irc.send('PRIVMSG', values['target'], ':Credits transferred from', \
                             values['nick'], 'to', nick + ':', str(credits))
                 else:
-                    self.irc.send('PRIVMSG', values['target'], ':', values['nick'], ': Not enough credits')
+                    self.irc.send('PRIVMSG', values['target'], ':' + values['nick'], ': Not enough credits')
         print(values['nick'] + ': ' + values['text'])
 
     def notice(self, values):
