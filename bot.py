@@ -7,6 +7,7 @@ class Pymarket:
         self.users = []
         self.handlers = {
                 'PRIVMSG': self.message,
+                'NOTICE': self.notice,
                 'JOIN': self.join,
                 'QUIT': self.leave,
                 'PART': self.leave,
@@ -17,7 +18,7 @@ class Pymarket:
 
     def parse_message(self, line):
         values = {}
-        if line[0] == ':' and '!' in line:
+        if line[0] == ':':
             prefix, line = line[1:].split(' ', 1)
             values['nick'] = prefix.split('!')[0]
             values['command'], line = line.split(' ', 1)
@@ -31,7 +32,28 @@ class Pymarket:
             self.irc.send('PONG', line.split()[1])
 
     def message(self, values):
+        if values['target'] == 'PyMarket':
+            self.notice(values)
+            return
+        command = values['text'].split()[0]
+        if '+=' in command:
+            nick, credits = command.split('+=', 1)
+            try:
+                credits = int(credits)
+            except:
+                credits = False
+            if nick in self.users and credits > 0:
+                success = db.transfer(values['nick'], nick, credits)
+                if success:
+                    self.irc.send('PRIVMSG', values['target'], ':Credits transferred from', \
+                            values['nick'], 'to', nick + ':', str(credits))
+                else:
+                    self.irc.send('PRIVMSG', values['target'], ':', values['nick'], ': Not enough credits')
         print(values['nick'] + ': ' + values['text'])
+
+    def notice(self, values):
+        if 'credits' in values['text']:
+            self.irc.send('NOTICE', values['nick'], ':', str(db.checkBal(values['nick'])))
 
     def join(self, values):
         self.users.append(values['nick'])
@@ -42,11 +64,11 @@ class Pymarket:
         print('%s left' % values['nick'])
         
     def names(self, values):
-        self.users += values['nick']
+        self.users = values['text'].split()
         print(self.users)
-        for i in self.users:
-            if not db.checkBal(i):
-                db.addAcc(i)
+        for user in self.users:
+            if not db.checkBal(user):
+                db.addAcc(user)
 
 def main():
     connection = irc.Irc('irc.freenode.net', 6667, 'PyMarket', '#gyaretto')
