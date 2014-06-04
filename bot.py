@@ -32,10 +32,16 @@ class Pymarket:
             self.irc.send('PONG', line.split()[1])
 
     def message(self, values):
+        print(values['nick'] + ': ' + values['text'])
+        sys.stdout.flush()
+
         if values['target'] == 'PyMarket':
             self.notice(values)
             return
-        command = values['text'].split()[0]
+        try:
+            command = values['text'].split()[0]
+        except:
+            return
         if '+=' in command:
             nick, credits = command.split('+=', 1)
             try:
@@ -53,8 +59,6 @@ class Pymarket:
             self.irc.send('PRIVMSG', values['target'], ':' + '\"<nick>+=X\" will transfer X credits to <nick>.')
             self.irc.send('PRIVMSG', values['target'], ':' + \
                     'PM or NOTICE PyMarket with the word \"credits\" to see your credits.')
-        print(values['nick'] + ': ' + values['text'])
-        sys.stdout.flush()
 
     def notice(self, values):
         if 'credits' in values['text']:
