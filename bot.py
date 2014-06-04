@@ -1,4 +1,4 @@
-import re, irc, db
+import re, irc, db, sys
 
 class Pymarket:
 
@@ -47,9 +47,14 @@ class Pymarket:
                                 values['nick'], 'to', nick + ':', str(credits))
                     else:
                         self.irc.send('PRIVMSG', values['target'], ':' + values['nick'], ': Not enough credits')
-            except ValueError:
-               print('Credits not a number.')
+            except ValueError as e:
+                pass
+        if 'PyMarket' in command and 'help' in values['text']:
+            self.irc.send('PRIVMSG', values['target'], ':' + '\"<nick>+=X\" will transfer X credits to <nick>.')
+            self.irc.send('PRIVMSG', values['target'], ':' + \
+                    'PM or NOTICE PyMarket with the word \"credits\" to see your credits.')
         print(values['nick'] + ': ' + values['text'])
+        sys.stdout.flush()
 
     def notice(self, values):
         if 'credits' in values['text']:
@@ -58,27 +63,27 @@ class Pymarket:
     def join(self, values):
         self.users.append(values['nick'])
         print('%s joined %s' % (values['nick'], values['target']))
+        sys.stdout.flush()
 
     def leave(self, values):
         self.users.remove(values['nick'])
         print('%s left' % values['nick'])
+        sys.stdout.flush()
         
     def names(self, values):
         self.users = values['text'].split()
-        print(self.users)
         for user in self.users:
             if not db.checkBal(user):
                 db.addAcc(user)
 
 def main():
-    connection = irc.Irc('irc.freenode.net', 6667, 'PyMarket', '#gyaretto')
+    connection = irc.Irc('mccs.stu.marist.edu', 6667, 'PyMarket', '#chat')
     bot = Pymarket(connection)
     connection.connect()
     while True:
         line = connection.receive()
         if line:
             for text in line:
-                print(text)
                 bot.parse_message(text)
 
 if __name__ == "__main__":
