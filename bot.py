@@ -11,8 +11,8 @@ class Pymarket:
             'JOIN': self.join,
             'QUIT': self.leave,
             'PART': self.leave,
-            'KICK': self.leave,
-            'KILL': self.leave,
+            'KICK': self.kick,
+            'KILL': self.kick,
             'NICK': self.nick,
             '353': self.names
         }
@@ -30,11 +30,12 @@ class Pymarket:
                 self.irc.send('PONG', ':' + values['text'])
         args = line.split()
         values['command'] = args.pop(0)
-        if len(args) >= 1:
-            values['target'] = args.pop(-1)
-        else:
-            values['target'] = values['text']
-        if len(values) >= 3:
+        if len(args) == 2:
+            values['target'] = args.pop(0)
+            values['extra'] = args.pop(0)
+        elif len(args) == 1:
+            values['target'] = args.pop(0)
+        if len(values) >= 2:
             choice = self.handlers.get(values['command'])
             if choice:
                 choice(values)
@@ -84,6 +85,11 @@ class Pymarket:
         print('%s left' % values['nick'])
         sys.stdout.flush()
 
+    def kick(self, values):
+        self.users.remove(values['extra'])
+        print('%s was kicked from %s by %s' % (values['extra'], values['target'], values['nick']))
+        sys.stdout.flush()
+
     def nick(self, values):
         self.users.append(values['text'])
         if not db.checkBal(values['text']):
@@ -96,17 +102,18 @@ class Pymarket:
         for nick in values['text'].split():
             self.users.append(re.match('^[~&@%+]?(.*)$', nick).group(1))
         for user in self.users:
-            sys.stdout.flush()
             if not db.checkBal(user):
                 db.addAcc(user)
 
 def main():
-    connection = irc.Irc('mccs.stu.marist.edu', 6667, 'PyMarket', '#chat')
+    connection = irc.Irc('irc.freenode.net', 6667, 'PyMarket', '#lpmc')
     bot = Pymarket(connection)
     connection.connect()
     while True:
         line = connection.receive()
         for text in line:
+            print(text)
+            sys.stdout.flush()
             bot.parse_message(text)
 
 if __name__ == "__main__":
