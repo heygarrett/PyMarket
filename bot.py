@@ -35,10 +35,9 @@ class Pymarket:
             values['extra'] = args.pop(0)
         elif len(args) == 1:
             values['target'] = args.pop(0)
-        if len(values) >= 2:
-            choice = self.handlers.get(values['command'])
-            if choice:
-                choice(values)
+        choice = self.handlers.get(values['command'])
+        if choice:
+            choice(values)
 
     def message(self, values):
         print(values['nick'] + ': ' + values['text'])
@@ -55,7 +54,7 @@ class Pymarket:
             nick, credits = command.split('+=', 1)
             try:
                 credits = int(credits)
-                if nick in self.users and credits > 0:
+                if nick in self.users and credits > 0 and values['nick'] != nick:
                     success = db.transfer(values['nick'], nick, credits)
                     if success:
                         self.irc.send('PRIVMSG', values['target'], ':Credits transferred from', \
@@ -75,8 +74,7 @@ class Pymarket:
 
     def join(self, values):
         self.users.append(values['nick'])
-        if not db.checkBal(values['nick']):
-            db.addAcc(values['nick'])
+        db.addAcc(values['nick'])
         print('%s joined %s' % (values['nick'], values['target']))
         sys.stdout.flush()
 
@@ -92,8 +90,7 @@ class Pymarket:
 
     def nick(self, values):
         self.users.append(values['text'])
-        if not db.checkBal(values['text']):
-            db.addAcc(values['text'])
+        db.addAcc(values['text'])
         self.users.remove(values['nick'])
         print('%s is now %s' % (values['nick'], values['text']))
         sys.stdout.flush()
@@ -102,11 +99,10 @@ class Pymarket:
         for nick in values['text'].split():
             self.users.append(re.match('^[~&@%+]?(.*)$', nick).group(1))
         for user in self.users:
-            if not db.checkBal(user):
-                db.addAcc(user)
+            db.addAcc(user)
 
 def main():
-    connection = irc.Irc('irc.freenode.net', 6667, 'PyMarket', '#lpmc')
+    connection = irc.Irc('irc.freenode.net', 6667, 'PyMarket', '#gyaretto')
     bot = Pymarket(connection)
     connection.connect()
     while True:
