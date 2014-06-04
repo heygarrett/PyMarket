@@ -1,1 +1,1 @@
-Python IRC bot
+PyMarket is an IRC bot that attempts to emulate a basic currency system. Each member of the channel is registered in a redis key-value store with 15 credits to start. Credits can be given to other members of the channel allowing for bidding, trading, auctioning, betting, etc.
