@@ -13,6 +13,7 @@ class Pymarket:
             'PART': self.leave,
             'KICK': self.leave,
             'KILL': self.leave,
+            'NICK': self.nick,
             '353': self.names
         }
 
@@ -25,20 +26,18 @@ class Pymarket:
             line = line[1]
         if ' :' in line:
             line, values['text'] = line.split(' :', 1)
+            if line == 'PING':
+                self.irc.send('PONG', ':' + values['text'])
         args = line.split()
         values['command'] = args.pop(0)
         if len(args) >= 1:
             values['target'] = args.pop(-1)
         else:
             values['target'] = values['text']
-            del values['text']
-        print('values: ', values)
         if len(values) >= 3:
             choice = self.handlers.get(values['command'])
             if choice:
                 choice(values)
-        if line.split()[0] == 'PING':
-            self.irc.send('PONG', line.split()[1])
 
     def message(self, values):
         print(values['nick'] + ': ' + values['text'])
@@ -61,7 +60,7 @@ class Pymarket:
                         self.irc.send('PRIVMSG', values['target'], ':Credits transferred from', \
                                 values['nick'], 'to', nick + ':', str(credits))
                     else:
-                        self.irc.send('PRIVMSG', values['target'], ':' + values['nick'], ': Not enough credits')
+                        self.irc.send('PRIVMSG', values['target'], ':' + values['nick'] + ': Not enough credits')
             except ValueError:
                 pass
         if self.irc.name in command and 'help' in values['text']:
@@ -75,12 +74,22 @@ class Pymarket:
 
     def join(self, values):
         self.users.append(values['nick'])
+        if not db.checkBal(values['nick']):
+            db.addAcc(values['nick'])
         print('%s joined %s' % (values['nick'], values['target']))
         sys.stdout.flush()
 
     def leave(self, values):
         self.users.remove(values['nick'])
         print('%s left' % values['nick'])
+        sys.stdout.flush()
+
+    def nick(self, values):
+        self.users.append(values['text'])
+        if not db.checkBal(values['text']):
+            db.addAcc(values['text'])
+        self.users.remove(values['nick'])
+        print('%s is now %s' % (values['nick'], values['text']))
         sys.stdout.flush()
         
     def names(self, values):
@@ -98,7 +107,6 @@ def main():
     while True:
         line = connection.receive()
         for text in line:
-            print(text)
             sys.stdout.flush()
             bot.parse_message(text)
 
