@@ -6,24 +6,33 @@ class Pymarket:
         self.irc = connection
         self.users = []
         self.handlers = {
-                'PRIVMSG': self.message,
-                'NOTICE': self.notice,
-                'JOIN': self.join,
-                'QUIT': self.leave,
-                'PART': self.leave,
-                'KICK': self.leave,
-                'KILL': self.leave,
-                '353': self.names
+            'PRIVMSG': self.message,
+            'NOTICE': self.notice,
+            'JOIN': self.join,
+            'QUIT': self.leave,
+            'PART': self.leave,
+            'KICK': self.leave,
+            'KILL': self.leave,
+            '353': self.names
         }
 
     def parse_message(self, line):
         values = {}
         if line[0] == ':':
-            prefix, line = line[1:].split(' ', 1)
-            values['nick'] = prefix.split('!')[0]
-            values['command'], line = line.split(' ', 1)
+            line = line[1:].split(' ', 1)
+            if '!' in line[0]:
+                values['nick'] = line[0].split('!')[0]
+            line = line[1]
         if ' :' in line:
-            values['target'], values['text'] = line.split(' :', 1)
+            line, values['text'] = line.split(' :', 1)
+        args = line.split()
+        values['command'] = args.pop(0)
+        if len(args) >= 1:
+            values['target'] = args.pop(-1)
+        else:
+            values['target'] = values['text']
+            del values['text']
+        print('values: ', values)
         if len(values) >= 3:
             choice = self.handlers.get(values['command'])
             if choice:
@@ -35,7 +44,7 @@ class Pymarket:
         print(values['nick'] + ': ' + values['text'])
         sys.stdout.flush()
 
-        if values['target'] == 'PyMarket':
+        if values['target'] == self.irc.name:
             self.notice(values)
             return
         try:
@@ -53,9 +62,9 @@ class Pymarket:
                                 values['nick'], 'to', nick + ':', str(credits))
                     else:
                         self.irc.send('PRIVMSG', values['target'], ':' + values['nick'], ': Not enough credits')
-            except ValueError as e:
+            except ValueError:
                 pass
-        if 'PyMarket' in command and 'help' in values['text']:
+        if self.irc.name in command and 'help' in values['text']:
             self.irc.send('PRIVMSG', values['target'], ':' + '\"<nick>+=X\" will transfer X credits to <nick>.')
             self.irc.send('PRIVMSG', values['target'], ':' + \
                     'PM or NOTICE PyMarket with the word \"credits\" to see your credits.')
@@ -75,20 +84,23 @@ class Pymarket:
         sys.stdout.flush()
         
     def names(self, values):
-        self.users = values['text'].split()
+        for nick in values['text'].split():
+            self.users.append(re.match('^[~&@%+]?(.*)$', nick).group(1))
         for user in self.users:
+            sys.stdout.flush()
             if not db.checkBal(user):
                 db.addAcc(user)
 
 def main():
-    connection = irc.Irc('irc.freenode.net', 6667, 'PyMarket', '#lpmc')
+    connection = irc.Irc('mccs.stu.marist.edu', 6667, 'PyMarket', '#chat')
     bot = Pymarket(connection)
     connection.connect()
     while True:
         line = connection.receive()
-        if line:
-            for text in line:
-                bot.parse_message(text)
+        for text in line:
+            print(text)
+            sys.stdout.flush()
+            bot.parse_message(text)
 
 if __name__ == "__main__":
     main()
