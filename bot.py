@@ -107,7 +107,6 @@ def main():
     while True:
         line = connection.receive()
         for text in line:
-            sys.stdout.flush()
             bot.parse_message(text)
 
 if __name__ == "__main__":
