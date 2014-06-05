@@ -63,10 +63,12 @@ class Pymarket:
                         self.irc.send('PRIVMSG', values['target'], ':' + values['nick'] + ': Not enough credits')
             except ValueError:
                 pass
-        if self.irc.name in command and 'help' in values['text']:
-            self.irc.send('PRIVMSG', values['target'], ':' + '\"<nick>+=X\" will transfer X credits to <nick>.')
-            self.irc.send('PRIVMSG', values['target'], ':' + \
-                    'PM or NOTICE PyMarket with the word \"credits\" to see your credits.')
+        test = re.match('(\\w+)[:,]?', command)
+        if test:
+            if self.irc.name == test.group(1) and 'help' in values['text']:
+                self.irc.send('PRIVMSG', values['target'], ':' + '\"<nick>+=X\" will transfer X credits to <nick>.')
+                self.irc.send('PRIVMSG', values['target'], ':' + \
+                        'PM or NOTICE PyMarket with the word \"credits\" to see your credits.')
 
     def notice(self, values):
         if 'credits' in values['text']:
@@ -102,7 +104,7 @@ class Pymarket:
             db.addAcc(user)
 
 def main():
-    connection = irc.Irc('irc.freenode.net', 6667, 'PyMarket', '#gyaretto')
+    connection = irc.Irc('irc.freenode.net', 6667, 'PyMarket', '#lpmc')
     bot = Pymarket(connection)
     connection.connect()
     while True:
