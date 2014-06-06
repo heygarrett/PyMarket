@@ -1,4 +1,4 @@
-import re, irc, db, sys
+import re, irc, db
 
 class Pymarket:
 
@@ -40,9 +40,6 @@ class Pymarket:
             choice(values)
 
     def message(self, values):
-        print(values['nick'] + ': ' + values['text'])
-        sys.stdout.flush()
-
         if values['target'] == self.irc.name:
             self.notice(values)
             return
@@ -77,25 +74,17 @@ class Pymarket:
     def join(self, values):
         self.users.append(values['nick'])
         db.addAcc(values['nick'])
-        print('%s joined %s' % (values['nick'], values['target']))
-        sys.stdout.flush()
 
     def leave(self, values):
         self.users.remove(values['nick'])
-        print('%s left' % values['nick'])
-        sys.stdout.flush()
 
     def kick(self, values):
         self.users.remove(values['extra'])
-        print('%s was kicked from %s by %s' % (values['extra'], values['target'], values['nick']))
-        sys.stdout.flush()
 
     def nick(self, values):
         self.users.append(values['text'])
         db.addAcc(values['text'])
         self.users.remove(values['nick'])
-        print('%s is now %s' % (values['nick'], values['text']))
-        sys.stdout.flush()
         
     def names(self, values):
         for nick in values['text'].split():
@@ -111,7 +100,6 @@ def main():
         line = connection.receive()
         for text in line:
             print(text)
-            sys.stdout.flush()
             bot.parse_message(text)
 
 if __name__ == "__main__":
