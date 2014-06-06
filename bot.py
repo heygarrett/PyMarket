@@ -104,7 +104,7 @@ class Pymarket:
             db.addAcc(user)
 
 def main():
-    connection = irc.Irc('irc.freenode.net', 6667, 'PyMarket', '#lpmc')
+    connection = irc.Irc('irc.freenode.net', 6667, 'PyMarket', '#learnprogramming,#lpmc')
     bot = Pymarket(connection)
     connection.connect()
     while True:
