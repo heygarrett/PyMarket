@@ -88,7 +88,7 @@ class Pymarket:
         
     def names(self, values):
         for nick in values['text'].split():
-            self.users.append(re.match('^[~&@%+]?(.*)$', nick).group(1))
+            self.users.append(re.match('^[~&@%+]?(.+)$', nick).group(1))
         for user in self.users:
             db.addAcc(user)
 
