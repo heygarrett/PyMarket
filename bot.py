@@ -52,8 +52,7 @@ class Pymarket:
             try:
                 credits = int(credits)
                 if nick in self.users and credits > 0 and values['nick'] != nick:
-                    success = db.transfer(values['nick'], nick, credits)
-                    if success:
+                    if db.transfer(values['nick'], nick, credits):
                         self.irc.send('PRIVMSG', values['target'], ':Credits transferred from', \
                                 values['nick'], 'to', nick + ':', str(credits))
                     else:
@@ -96,7 +95,7 @@ class Pymarket:
             db.addAcc(user)
 
 def main():
-    connection = irc.Irc('irc.freenode.net', 6667, 'PyMarket', '#learnprogramming,#lpmc')
+    connection = irc.Irc('mccs.stu.marist.edu', 6667, 'PyMarket', '#chat')
     bot = Pymarket(connection)
     connection.connect()
     while True:
