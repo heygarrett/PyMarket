@@ -4,7 +4,7 @@ class Pymarket:
 
     def __init__(self, connection):
         self.irc = connection
-        self.users = []
+        self.users = set()
         self.handlers = {
             'PRIVMSG': self.message,
             'NOTICE': self.notice,
@@ -72,28 +72,31 @@ class Pymarket:
             self.irc.send('NOTICE', values['nick'], ':', str(db.checkBal(values['nick'])))
 
     def join(self, values):
-        self.users.append(values['nick'])
+        self.users.add(values['nick'])
         db.addAcc(values['nick'])
 
     def leave(self, values):
-        self.users.remove(values['nick'])
+        if values['nick'] in self.users:
+            self.users.remove(values['nick'])
 
     def kick(self, values):
-        self.users.remove(values['extra'])
+        if values['extra'] in self.users:
+            self.users.remove(values['extra'])
 
     def nick(self, values):
-        self.users.append(values['text'])
+        self.users.add(values['text'])
         db.addAcc(values['text'])
-        self.users.remove(values['nick'])
+        if values['nick'] in self.users:
+            self.users.remove(values['nick'])
         
     def names(self, values):
         for nick in values['text'].split():
-            self.users.append(re.match('^[~&@%+]?(.+)$', nick).group(1))
+            self.users.add(re.match('^[~&@%+]?(.+)$', nick).group(1))
         for user in self.users:
             db.addAcc(user)
 
 def main():
-    connection = irc.Irc('irc.freenode.net', 6667, 'PyMarket', '#learnprogramming,#lpmc')
+    connection = irc.Irc('mccs.stu.marist.edu', 6667, 'PyMarket', '#chat')
     bot = Pymarket(connection)
     connection.connect()
     while True:
