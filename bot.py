@@ -48,30 +48,37 @@ class Pymarket:
         except:
             return
         if '+=' in command:
-            nick, credits = command.split('+=', 1)
+            rcv, credits = command.split('+=', 1)
             try:
                 credits = int(credits)
-                if nick in self.users and credits > 0 and values['nick'] != nick:
-                    if db.transfer(values['nick'], nick, credits):
-                        self.irc.send('PRIVMSG', values['target'], ':Credits transferred from', \
-                                values['nick'], 'to', nick + ':', str(credits))
+                if rcv in self.users and credits > 0 and values['nick'] != rcv:
+                    if db.transfer(values['nick'], rcv, credits):
+                        self.irc.send(
+                            'PRIVMSG', values['target'], 
+                            ':Credits transferred from', values['nick'], 
+                            'to', rcv + ':', str(credits))
                     else:
-                        self.irc.send('PRIVMSG', values['target'], ':' + values['nick'] + \
-                                ': Not enough credits')
+                        self.irc.send(
+                            'PRIVMSG', values['target'], 
+                            ':' + values['nick'] + ': Not enough credits.')
             except ValueError:
                 pass
         test = re.match('(\\w+)[:,]?', command)
         if test:
             if self.irc.name == test.group(1) and 'help' in values['text']:
-                self.irc.send('PRIVMSG', values['target'], ':' + \
-                        '\"<nick>+=X\" will transfer X credits to <nick>.')
-                self.irc.send('PRIVMSG', values['target'], ':' + \
-                        'PM or NOTICE PyMarket with <nick> to see <nick>\'s credits.')
+                self.irc.send(
+                    'PRIVMSG', values['target'], 
+                    ':' + '\"<nick>+=X\" will transfer X credits to <nick>.')
+                self.irc.send(
+                    'PRIVMSG', values['target'], 
+                    ':' + 'PM or NOTICE PyMarket with '
+                    '<nick> to see <nick>\'s credits.')
 
     def notice(self, values):
         if db.checkBal(values['text']):
-            self.irc.send('NOTICE', values['nick'], ':' + \
-                    values['text'], 'has', str(db.checkBal(values['text'])), 'credits.')
+            self.irc.send(
+                    'NOTICE', values['nick'], ':' + values['text'], 
+                    'has', str(db.checkBal(values['text'])), 'credits.')
 
     def join(self, values):
         self.users.add(values['nick'])
@@ -98,7 +105,9 @@ class Pymarket:
             db.addAcc(user)
 
 def main():
-    connection = irc.Irc('irc.freenode.net', 6667, 'PyMarket', '#learnprogramming,#lpmc')
+    connection = irc.Irc(
+        'irc.freenode.net', 6667, 
+        'PyMarket', '#learnprogramming,#lpmc')
     bot = Pymarket(connection)
     connection.connect()
     while True:
