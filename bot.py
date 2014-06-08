@@ -31,10 +31,9 @@ class Pymarket:
         args = line.split()
         values['command'] = args.pop(0)
         if len(args) == 2:
-            values['target'] = args.pop(0)
-            values['extra'] = args.pop(0)
+            values['target'], values['extra'] = args
         elif len(args) == 1:
-            values['target'] = args.pop(0)
+            values['target'] = args[0]
         choice = self.handlers.get(values['command'])
         if choice:
             choice(values)

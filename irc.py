@@ -24,6 +24,5 @@ class Irc:
         self.buf += self.client.recv(4096).decode()
         if '\r\n' in self.buf:
             line = self.buf.split('\r\n')
-            self.buf = line[-1]
-            line = line[:-1]
+            self.buf = line.pop(-1)
             return line
