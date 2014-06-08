@@ -72,9 +72,6 @@ class Pymarket:
         if db.checkBal(values['text']):
             self.irc.send('NOTICE', values['nick'], ':' + \
                     values['text'], 'has', str(db.checkBal(values['text'])), 'credits.')
-        else:
-            self.irc.send('NOTICE', values['nick'], ':' + \
-                    'Sorry, but', values['text'], 'does not have an account.')
 
     def join(self, values):
         self.users.add(values['nick'])
