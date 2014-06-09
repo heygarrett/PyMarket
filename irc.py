@@ -7,7 +7,7 @@ class Irc:
         self.port = port
         self.name = name
         self.channel = channel
-        self.buf = ''
+        self.buf = b''
         self.client = socket.socket()
 
     def connect(self):
@@ -21,8 +21,8 @@ class Irc:
         self.client.send(line.encode())
 
     def receive(self):
-        self.buf += self.client.recv(4096).decode()
-        if '\r\n' in self.buf:
-            line = self.buf.split('\r\n')
-            self.buf = line.pop(-1)
-            return line
+        self.buf += self.client.recv(4096)
+        if b'\r\n' in self.buf:
+            lines = self.buf.split(b'\r\n')
+            self.buf = lines.pop(-1)
+            return lines

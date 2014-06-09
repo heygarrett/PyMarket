@@ -110,8 +110,9 @@ def main():
     bot = Pymarket(connection)
     connection.connect()
     while True:
-        line = connection.receive()
-        for text in line:
+        lines = connection.receive()
+        for text in lines:
+            text = text.decode()
             print(text)
             bot.parse_message(text)
 
