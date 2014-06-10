@@ -22,7 +22,6 @@ class Irc:
 
     def receive(self):
         self.buf += self.client.recv(4096)
-        if b'\r\n' in self.buf:
-            lines = self.buf.split(b'\r\n')
-            self.buf = lines.pop(-1)
-            return lines
+        lines = self.buf.split(b'\r\n')
+        self.buf = lines.pop(-1)
+        return lines
