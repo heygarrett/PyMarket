@@ -116,7 +116,7 @@ def main():
 
     freenodeConnect = irc.Irc(
         'irc.freenode.net', 6667, 
-        'PyMarket_', '#learnprogramming,#lpmc')
+        'PyMarket', '#learnprogramming,#lpmc')
     mccsConnect = irc.Irc(
         'mccs.stu.marist.edu', 6667, 
         'PyMarket', '#chat')
