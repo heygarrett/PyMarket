@@ -2,7 +2,8 @@ import re, irc, db, threading
 
 class Pymarket:
 
-    def __init__(self, connection):
+    def __init__(self, serverName, connection):
+        self.server = serverName
         self.irc = connection
         self.users = set()
         self.handlers = {
@@ -51,7 +52,7 @@ class Pymarket:
             try:
                 credits = int(credits)
                 if rcv in self.users and credits > 0 and values['nick'] != rcv:
-                    if db.transfer(values['nick'], rcv, credits):
+                    if db.transfer(self.server, values['nick'], rcv, credits):
                         self.irc.send(
                             'PRIVMSG', values['target'], 
                             ':Credits transferred from', values['nick'], 
@@ -74,14 +75,14 @@ class Pymarket:
                     '<nick> to see <nick>\'s credits.')
 
     def notice(self, values):
-        if db.checkBal(values['text']):
+        if db.checkBal(self.server, values['text']):
             self.irc.send(
                     'NOTICE', values['nick'], ':' + values['text'], 
-                    'has', str(db.checkBal(values['text'])), 'credits.')
+                    'has', str(db.checkBal(self.server, values['text'])), 'credits.')
 
     def join(self, values):
         self.users.add(values['nick'])
-        db.addAcc(values['nick'])
+        db.addAcc(self.server, values['nick'])
 
     def leave(self, values):
         if values['nick'] in self.users:
@@ -93,7 +94,7 @@ class Pymarket:
 
     def nick(self, values):
         self.users.add(values['text'])
-        db.addAcc(values['text'])
+        db.addAcc(self.server, values['text'])
         if values['nick'] in self.users:
             self.users.remove(values['nick'])
         
@@ -101,7 +102,7 @@ class Pymarket:
         for nick in values['text'].split():
             self.users.add(re.match('^[~&@%+]?(.+)$', nick).group(1))
         for user in self.users:
-            db.addAcc(user)
+            db.addAcc(self.server, user)
 
 def main():
 
@@ -116,12 +117,12 @@ def main():
 
     freenodeConnect = irc.Irc(
         'irc.freenode.net', 6667, 
-        'PyMarket', '#learnprogramming,#lpmc')
+        'PyMarket_', '#learnprogramming,#lpmc')
     mccsConnect = irc.Irc(
         'mccs.stu.marist.edu', 6667, 
-        'PyMarket', '#chat')
-    freenode = Pymarket(freenodeConnect)
-    mccs = Pymarket(mccsConnect)
+        'PyMarket_', '#chat')
+    freenode = Pymarket('freenode', freenodeConnect)
+    mccs = Pymarket('mccs', mccsConnect)
     threading.Thread(target=startBot, args=(freenode,)).start()
     threading.Thread(target=startBot, args=(mccs,)).start()
 
