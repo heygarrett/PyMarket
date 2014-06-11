@@ -1,4 +1,4 @@
-import re, irc, db, _thread
+import re, irc, db, threading
 
 class Pymarket:
 
@@ -106,10 +106,7 @@ class Pymarket:
 def main():
 
     def startBot(bot):
-        print(bot)
-        print('startBot called.')
         bot.irc.connect()
-        print('bot connected')
         while True:
             lines = bot.irc.receive()
             for text in lines:
@@ -119,14 +116,14 @@ def main():
 
     freenodeConnect = irc.Irc(
         'irc.freenode.net', 6667, 
-        'PyMarket', '#learnprogramming,#lpmc')
+        'PyMarket_', '#learnprogramming,#lpmc')
     mccsConnect = irc.Irc(
         'mccs.stu.marist.edu', 6667, 
         'PyMarket', '#chat')
     freenode = Pymarket(freenodeConnect)
     mccs = Pymarket(mccsConnect)
-    print(_thread.start_new_thread(startBot, (freenode,)))
-    print(_thread.start_new_thread(startBot, (mccs,)))
+    threading.Thread(target=startBot, args=(freenode,)).start()
+    threading.Thread(target=startBot, args=(mccs,)).start()
 
 if __name__ == '__main__':
     main()
