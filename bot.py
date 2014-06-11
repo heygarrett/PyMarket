@@ -112,7 +112,7 @@ def main():
     while True:
         lines = connection.receive()
         for text in lines:
-            text = text.decode()
+            text = text.decode('utf-8', 'replace')
             print(text)
             bot.parse_message(text)
 
