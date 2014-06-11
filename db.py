@@ -3,8 +3,7 @@ import redis
 accounts = redis.Redis('127.0.0.1', '6379')
 
 def addAcc(server, nick):
-    if not checkBal(server, nick):
-        accounts.hset(server, nick, 15)
+        accounts.hsetnx(server, nick, 15)
 
 def removeAcc(nick):
     accounts.delete(nick)
