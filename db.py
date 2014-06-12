@@ -2,13 +2,12 @@ import redis
 
 accounts = redis.Redis('127.0.0.1', '6379')
 
-def addAcc(server, nick):
-        accounts.hsetnx(server, nick, 15)
-
 def removeAcc(nick):
     accounts.delete(nick)
 
 def transfer(server, giver, receiver, amount):
+    accounts.hsetnx(server, giver, 15)
+    accounts.hsetnx(server, receiver, 15)
     if checkBal(server, giver) - amount >= 0:
         pipe = accounts.pipeline()
         pipe.hincrby(server, receiver, amount)
@@ -22,4 +21,4 @@ def checkBal(server, nick):
     try:
         return int(accounts.hget(server, nick))
     except:
-        return False
+        return 15

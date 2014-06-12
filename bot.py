@@ -75,14 +75,13 @@ class Pymarket:
                     '<nick> to see <nick>\'s credits.')
 
     def notice(self, values):
-        if db.checkBal(self.server, values['text']):
+        if 'nick' in values and 'text' in values:
             self.irc.send(
-                    'NOTICE', values['nick'], ':' + values['text'], 
-                    'has', str(db.checkBal(self.server, values['text'])), 'credits.')
+                'NOTICE', values['nick'], ':' + values['text'], 
+                'has', str(db.checkBal(self.server, values['text'])), 'credits.')
 
     def join(self, values):
         self.users.add(values['nick'])
-        db.addAcc(self.server, values['nick'])
 
     def leave(self, values):
         if values['nick'] in self.users:
@@ -94,15 +93,12 @@ class Pymarket:
 
     def nick(self, values):
         self.users.add(values['text'])
-        db.addAcc(self.server, values['text'])
         if values['nick'] in self.users:
             self.users.remove(values['nick'])
         
     def names(self, values):
         for nick in values['text'].split():
             self.users.add(re.match('^[~&@%+]?(.+)$', nick).group(1))
-        for user in self.users:
-            db.addAcc(self.server, user)
 
 def main():
 
