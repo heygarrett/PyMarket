@@ -1,4 +1,4 @@
-import re, irc, db, threading
+import re, irc, db, threading, config
 
 class Pymarket:
 
@@ -111,16 +111,12 @@ def main():
                 print(text)
                 bot.parse_message(text)
 
-    freenodeConnect = irc.Irc(
-        'irc.freenode.net', 6667, 
-        'PyMarket', '#learnprogramming,#lpmc')
-    mccsConnect = irc.Irc(
-        'mccs.stu.marist.edu', 6667, 
-        'PyMarket', '#chat')
-    freenode = Pymarket('freenode', freenodeConnect)
-    mccs = Pymarket('mccs', mccsConnect)
-    threading.Thread(target=startBot, args=(freenode,)).start()
-    threading.Thread(target=startBot, args=(mccs,)).start()
-
+    for server in config.servers:
+        connection = irc.Irc(
+            server['url'], server['port'],
+            server['nick'], server['channels'])
+        bot = Pymarket(server['name'], connection)
+        threading.Thread(target=startBot, args=(bot,)).start()
+        
 if __name__ == '__main__':
     main()
