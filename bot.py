@@ -75,10 +75,15 @@ class Pymarket:
                     '<nick> to see <nick>\'s credits.')
 
     def notice(self, values):
-        if 'nick' in values and 'text' in values:
+        numCredits = None
+        if db.checkBal(self.server, values['text']):
+            numCredits = db.checkBal(self.server, values['text'])
+        elif values['text'] in self.users:
+            numCredits = 15
+        if numCredits != None:
             self.irc.send(
                 'NOTICE', values['nick'], ':' + values['text'], 
-                'has', str(db.checkBal(self.server, values['text'])), 'credits.')
+                'has', str(numCredits), 'credits.')
 
     def join(self, values):
         self.users.add(values['nick'])

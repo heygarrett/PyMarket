@@ -21,4 +21,4 @@ def checkBal(server, nick):
     try:
         return int(accounts.hget(server, nick))
     except:
-        return 15
+        return False
