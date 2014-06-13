@@ -1,7 +1,7 @@
 servers = []
 
 servers.append({
-    'name': 'freenode',
+    'name': 'lpmc',
     'url': 'irc.freenode.net',
     'port': 6667,
     'nick': 'PyMarket',
