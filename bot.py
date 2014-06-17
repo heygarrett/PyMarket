@@ -30,8 +30,6 @@ class Pymarket:
         values = {}
         if line[0] == ':':
             values['prefix'], line = line[1:].split(' ', 1)
-        if ' :' in line:
-            line, values['text'] = line.split(' :', 1)
         line = line.split(' ', 1)
         if len(line) > 1:
             values['command'] = line[0]
@@ -43,9 +41,11 @@ class Pymarket:
         # values dictionary.
         if 'prefix' in values and '!' in values['prefix']:
             values['nick'] = values['prefix'].split('!', 1)[0]
-        if 'params' in values and ' :' in values['params']:
+        if 'params' in values and ':' in values['params']:
+            values['params'], values['text'] = values['params'].split(':', 1)
             values['params'] = values['params'].split()
-            values['target'] = values['params'].pop(0)
+            if len(values['params']) > 0:
+                values['target'] = values['params'].pop(0)
             if len(values['params']) > 0:
                 values['extra'] = values['params'].pop(0)
 
