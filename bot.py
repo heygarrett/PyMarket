@@ -18,23 +18,25 @@ class Pymarket:
             '353': self.names
         }
 
-    def parse_message(self, line):
+    def parseMessage(self, line):
         values = {}
         if line[0] == ':':
-            line = line[1:].split(' ', 1)
-            if '!' in line[0]:
-                values['nick'] = line[0].split('!')[0]
-            line = line[1]
-        if ' :' in line:
-            line, values['text'] = line.split(' :', 1)
-            if line == 'PING':
-                self.irc.send('PONG', ':' + values['text'])
-        args = line.split()
-        values['command'] = args.pop(0)
-        if len(args) == 2:
-            values['target'], values['extra'] = args
-        elif len(args) == 1:
-            values['target'] = args[0]
+            values['prefix'], line = line[1:].split(' ', 1)
+        line = line.split(' ', 1)
+        if len(line) > 1:
+            values['command'] = line[0]
+            values['params'] = line[1]
+        elif len(line) == 1:
+            values['command'] = line[0]
+
+        if '!' in values['prefix']:
+            values['nick'] = values['prefix'].split('!', 1)[0]
+        if 'params' in values and ' :' in values['params']:
+            values['params'], values['text'] = values['params'].split(' :', 1)
+            values['params'] = values['params'].split()
+            values['target'] = values['params'].pop(0)
+            if len(values['params']) > 0:
+                values['extra'] = values['params'].pop(0)
         choice = self.handlers.get(values['command'])
         if choice:
             choice(values)
@@ -114,7 +116,7 @@ def main():
             for text in lines:
                 text = text.decode('utf-8', 'replace')
                 print(text)
-                bot.parse_message(text)
+                bot.parseMessage(text)
 
     for server in config.servers:
         connection = irc.Irc(
