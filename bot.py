@@ -134,7 +134,7 @@ class Pymarket:
 
     # Responds to PINGs from the server.
     def ping(self, values):
-        self.irc.send('PONG', ':' + values['params'])
+        self.irc.send('PONG', ':' + values['text'])
         
     # Adds all nicks to set of present users when the bot joins.
     def names(self, values):
