@@ -15,6 +15,7 @@ class Pymarket:
             'KICK': self.kick,
             'KILL': self.kick,
             'NICK': self.nick,
+            'PING': self.ping,
             '353': self.names
         }
 
@@ -102,6 +103,9 @@ class Pymarket:
         self.users.add(values['text'])
         if values['nick'] in self.users:
             self.users.remove(values['nick'])
+
+    def ping(self, values):
+        self.irc.send('PONG', ':' + values['params'])
         
     def names(self, values):
         for nick in values['text'].split():
