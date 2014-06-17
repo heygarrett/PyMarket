@@ -29,7 +29,7 @@ class Pymarket:
         elif len(line) == 1:
             values['command'] = line[0]
 
-        if '!' in values['prefix']:
+        if 'prefix' in values and '!' in values['prefix']:
             values['nick'] = values['prefix'].split('!', 1)[0]
         if 'params' in values and ' :' in values['params']:
             values['params'], values['text'] = values['params'].split(' :', 1)
