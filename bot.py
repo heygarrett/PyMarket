@@ -41,8 +41,8 @@ class Pymarket:
             if len(values['params']) > 0:
                 values['extra'] = values['params'].pop(0)
 
-        # Matches the server command with the correct handler, making it easy 
-        # to call the correct method for that command.
+        # Matches the server command with the correct handler, making it easy to call the 
+        # correct method for that command.
         choice = self.handlers.get(values['command'])
         if choice:
             choice(values)
@@ -50,8 +50,8 @@ class Pymarket:
     # Handles messages from PRIVMSG commands.
     # NEEDS A REWRITE
     def message(self, values):
-        # Passes values to the notice method if the message target is the bot.
-        # Then exits method.
+        # Passes values to the notice method if the message target is the bot. Then exits
+        # method.
         if values['target'] == self.irc.name:
             self.notice(values)
             return
@@ -81,8 +81,8 @@ class Pymarket:
                 pass
         # Checks to see if the help command is issued and responds accordingly.
         test = re.match('(\\w+)[:,]?', command)
-        if test:
-            if self.irc.name == test.group(1) and 'help' in values['text']:
+        if test and self.irc.name == test.group(1): 
+            if 'help' in values['text']:
                 self.irc.send(
                     'PRIVMSG', values['target'], 
                     ':' + '\"<nick>+=X\" will transfer X credits to <nick>.')
@@ -90,6 +90,9 @@ class Pymarket:
                     'PRIVMSG', values['target'], 
                     ':' + 'PM or NOTICE PyMarket with '
                     '<nick> to see <nick>\'s credits.')
+            elif 'source' in values['text']:
+                self.irc.send('PRIVMSG', values['target'],
+                    ':' + 'https://github.com/garrettoreilly/PyMarket')
 
     # Responds to requests for credit checks.
     def notice(self, values):
