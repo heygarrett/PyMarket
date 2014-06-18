@@ -50,9 +50,8 @@ class Pymarket:
     # Handles messages from PRIVMSG commands.
     # NEEDS A REWRITE
     def message(self, values):
-        # Passes values to the notice method if the message target is the bot. Then exits
-        # method.
         if values['target'] == self.irc.name:
+            # Passes values to the notice method if the message target is the bot. 
             self.notice(values)
             return
         # Exits method if values['text'] contains nothing but spaces.
@@ -60,25 +59,26 @@ class Pymarket:
             command = values['text'].split()[0]
         except:
             return
-
         # Creates transaction when the transaction syntax is recognized.
         if '+=' in command:
             rcv, credits = command.split('+=', 1)
-            # An exception is raised if credits does not exist.
+            amount = 0
+            # An exception is raised if credits does not exist or is not a number.
             # e.g. PyMarket+=
             try:
-                credits = int(credits)
-                if rcv in self.users and credits > 0 and values['nick'] != rcv:
-                    if db.transfer(self.server, values['nick'], rcv, credits):
-                        self.irc.send(
-                            'PRIVMSG', values['target'], ':Credits transferred from',
-                            values['nick'], 'to', rcv + ':', str(credits))
-                    else:
-                        self.irc.send(
-                            'PRIVMSG', values['target'], 
-                            ':' + values['nick'] + ': Not enough credits.')
+                amount = int(credits)
             except ValueError:
                 pass
+            if amount > 0 and rcv in self.users and rcv != values['nick']:
+                if db.transfer(self.server, values['nick'], rcv, amount):
+                    self.irc.send(
+                        'PRIVMSG', values['target'], ':Credits transferred from',
+                        values['nick'], 'to', rcv + ':', str(credits))
+                else:
+                    self.irc.send(
+                        'PRIVMSG', values['target'], 
+                        ':' + values['nick'] + ': Not enough credits.')
+
         # Checks to see if the help command is issued and responds accordingly.
         test = re.match('(\\w+)[:,]?', command)
         if test and self.irc.name == test.group(1): 
