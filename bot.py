@@ -25,23 +25,15 @@ class Pymarket:
     # Parses each line from the server.
     # Receives line as a parameter.
     def parseMessage(self, line):
-        # Splits each line into three main components:
-        # prefix, command, and params.
+        # Splits each line into usable pieces.
         values = {}
         if line[0] == ':':
-            values['prefix'], line = line[1:].split(' ', 1)
-        line = line.split(' ', 1)
-        if len(line) > 1:
-            values['command'] = line[0]
-            values['params'] = line[1]
-        elif len(line) == 1:
-            values['command'] = line[0]
-
-        # Further splits those components into usable pieces stored in the 
-        # values dictionary.
-        if 'prefix' in values and '!' in values['prefix']:
-            values['nick'] = values['prefix'].split('!', 1)[0]
-        if 'params' in values and ':' in values['params']:
+            values['prefix'], values['command'], values['params'] = line[1:].split(' ', 2)
+            if '!' in values['prefix']:
+                values['nick'] = values['prefix'].split('!', 1)[0]
+        else:
+            values['command'], values['params'] = line.split(' ', 1)
+        if ':' in values['params']:
             values['params'], values['text'] = values['params'].split(':', 1)
             values['params'] = values['params'].split()
             if len(values['params']) > 0:
@@ -79,9 +71,8 @@ class Pymarket:
                 if rcv in self.users and credits > 0 and values['nick'] != rcv:
                     if db.transfer(self.server, values['nick'], rcv, credits):
                         self.irc.send(
-                            'PRIVMSG', values['target'], 
-                            ':Credits transferred from', values['nick'], 
-                            'to', rcv + ':', str(credits))
+                            'PRIVMSG', values['target'], ':Credits transferred from',
+                            values['nick'], 'to', rcv + ':', str(credits))
                     else:
                         self.irc.send(
                             'PRIVMSG', values['target'], 
