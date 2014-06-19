@@ -138,7 +138,7 @@ class Pymarket:
 def main():
     # Print timestamp before each line.
     def timestamp():
-        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     # Starts the bot and puts it in a receiving loop.
     def startBot(bot):
