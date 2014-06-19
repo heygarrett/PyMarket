@@ -137,7 +137,7 @@ class Pymarket:
 
 def main():
     # Print timestamp before each line.
-    def timestamp():
+    def currentTime():
         return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     # Starts the bot and puts it in a receiving loop.
@@ -147,7 +147,7 @@ def main():
             lines = bot.irc.receive()
             for text in lines:
                 text = text.decode('utf-8', 'replace')
-                print(timestamp(), text)
+                print(currentTime(), text)
                 bot.parseMessage(text)
 
     # Creates a thread for each instance in config.servers.
