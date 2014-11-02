@@ -63,11 +63,15 @@ class Pymarket:
             return
 
         for word in commandList:
-            if '/r/' in word and word.find('/r/') is 0:
-                if len(word) > 3:
+            if 'r/' in word:
+                if word.find('/r/') is 0 and len(word) > 3:
                     self.irc.send(
                             'PRIVMSG', values['target'],
                             ':' + 'https://reddit.com' + word)
+                elif word.find('r/') is 0 and len(word) > 2:
+                    self.irc.send(
+                            'PRIVMSG', values['target'],
+                            ':' + 'https://reddit.com/' + word)
 
         # Creates transaction when the transaction syntax is recognized.
         if '+=' in command:
