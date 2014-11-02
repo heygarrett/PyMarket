@@ -63,8 +63,7 @@ class Pymarket:
             return
 
         for word in commandList:
-            if '/r/' in word:
-                word = word[word.find('/r/'):]
+            if '/r/' in word and word.find('/r/') is 0:
                 if len(word) > 3:
                     self.irc.send(
                             'PRIVMSG', values['target'],
