@@ -54,11 +54,20 @@ class Pymarket:
             # Passes values to the notice method if the message target is the bot. 
             self.notice(values)
             return
+
         # Exits method if values['text'] contains nothing but spaces.
         try:
-            command = values['text'].split()[0]
+            commands = values['text'].split()
+            command = commands[0]
         except:
             return
+
+        for word in commands:
+            if '/r/' in word and len(word) > 3:
+                self.irc.send(
+                        'PRIVMSG', values['target'],
+                        ':' + 'https://reddit.com' + word)
+
         # Creates transaction when the transaction syntax is recognized.
         if '+=' in command:
             rcv, credits = command.split('+=', 1)
