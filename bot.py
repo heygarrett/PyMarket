@@ -57,16 +57,18 @@ class Pymarket:
 
         # Exits method if values['text'] contains nothing but spaces.
         try:
-            commands = values['text'].split()
-            command = commands[0]
+            commandList = values['text'].split()
+            command = commandList[0]
         except:
             return
 
-        for word in commands:
-            if '/r/' in word and len(word) > 3:
-                self.irc.send(
-                        'PRIVMSG', values['target'],
-                        ':' + 'https://reddit.com' + word)
+        for word in commandList:
+            if '/r/' in word:
+                word = word[word.find('/r/'):]
+                if len(word) > 3:
+                    self.irc.send(
+                            'PRIVMSG', values['target'],
+                            ':' + 'https://reddit.com' + word)
 
         # Creates transaction when the transaction syntax is recognized.
         if '+=' in command:
