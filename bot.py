@@ -110,13 +110,14 @@ class Pymarket:
 
     # Responds to requests for credit checks.
     def notice(self, values):
-        numCredits = db.checkBal(self.server, values['text'])
-        if numCredits == False and values['text'] in self.users:
-            numCredits = 15
-        elif values['text'] in self.users:
-            self.irc.send(
-                'NOTICE', values['nick'], ':' + values['text'], 
-                'has', str(numCredits), 'credits.')
+        if values['text'] in self.users:
+            numCredits = db.checkBal(self.server, values['text'])
+            if type(numCredits) is int:
+                self.irc.send(
+                    'NOTICE', values['nick'], ':' + values['text'], 
+                    'has', str(numCredits), 'credits.')
+            else:
+                numCredits = 15
 
     # Adds each user that joins to the set of present users.
     def join(self, values):
