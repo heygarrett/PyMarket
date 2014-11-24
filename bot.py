@@ -112,12 +112,11 @@ class Pymarket:
     def notice(self, values):
         if values['text'] in self.users:
             numCredits = db.checkBal(self.server, values['text'])
-            if type(numCredits) is int:
-                self.irc.send(
-                    'NOTICE', values['nick'], ':' + values['text'], 
-                    'has', str(numCredits), 'credits.')
-            else:
+            if type(numCredits) is not int:
                 numCredits = 15
+            self.irc.send(
+                'NOTICE', values['nick'], ':' + values['text'], 
+                'has', str(numCredits), 'credits.')
 
     # Adds each user that joins to the set of present users.
     def join(self, values):
