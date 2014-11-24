@@ -113,7 +113,7 @@ class Pymarket:
         numCredits = db.checkBal(self.server, values['text'])
         if numCredits == False and values['text'] in self.users:
             numCredits = 15
-        if numCredits:
+        elif values['text'] in self.users:
             self.irc.send(
                 'NOTICE', values['nick'], ':' + values['text'], 
                 'has', str(numCredits), 'credits.')
