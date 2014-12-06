@@ -114,9 +114,10 @@ class Pymarket:
                 numCredits = db.checkBal(self.server, values['nick'])
                 if type(numCredits) is not int:
                     numCredits = 15
+                form = 'credit.' if numCredits is 1 else 'credits.'
                 self.irc.send(
-                    'PRIVMSG', values['target'], ':' + values['nick'], 
-                    ': You have', str(numCredits), 'credits.')
+                    'PRIVMSG', values['target'], ':' + values['nick'] + ':', 
+                    'You have', str(numCredits), form)
                 
 
     # Responds to requests for credit checks.
