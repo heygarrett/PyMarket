@@ -115,7 +115,7 @@ class Pymarket:
                 if type(numCredits) is not int:
                     numCredits = 15
                 self.irc.send(
-                    'PRIVMSG', values['target'], ':' + values['text'], 
+                    'PRIVMSG', values['target'], ':' + values['nick'], 
                     ': You have', str(numCredits), 'credits.')
                 
 
@@ -125,9 +125,10 @@ class Pymarket:
             numCredits = db.checkBal(self.server, values['text'])
             if type(numCredits) is not int:
                 numCredits = 15
+            form = 'credit.' if numCredits is 1 else 'credits.'
             self.irc.send(
                 'NOTICE', values['nick'], ':' + values['text'], 
-                'has', str(numCredits), 'credits.')
+                'has', str(numCredits), form)
 
     # Adds each user that joins to the set of present users.
     def join(self, values):
