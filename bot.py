@@ -110,7 +110,7 @@ class Pymarket:
                 self.irc.send('PRIVMSG', values['target'],
                     ':' + 'https://github.com/garrettoreilly/PyMarket')
             elif test.group(2) in self.users:
-                numCredits = db.checkBal(self.server, values['test.group(2)'])
+                numCredits = db.checkBal(self.server, test.group(2))
                 if type(numCredits) is not int:
                     numCredits = 15
                 form = 'credit.' if numCredits is 1 else 'credits.'
