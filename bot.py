@@ -97,9 +97,9 @@ class Pymarket:
                         ':' + values['nick'] + ': Not enough credits.')
 
         # Checks to see if the help command is issued and responds accordingly.
-        test = re.match('(\\w+)[:,]?', command)
-        if test and self.irc.name == test.group(1): 
-            if 'help' in values['text']:
+        test = re.match(r'(\w+)[:,]? (\w+)', values['text'])
+        if test and test.group(1) == self.irc.name: 
+            if test.group(2) == 'help':
                 self.irc.send(
                     'PRIVMSG', values['target'], 
                     ':' + '\"<nick>+=X\" will transfer X credits to <nick>.')
@@ -107,16 +107,16 @@ class Pymarket:
                     'PRIVMSG', values['target'], 
                     ':' + 'PM or NOTICE PyMarket with '
                     '<nick> to see <nick>\'s credits.')
-            elif 'source' in values['text']:
+            elif test.group(2) == 'source':
                 self.irc.send('PRIVMSG', values['target'],
                     ':' + 'https://github.com/garrettoreilly/PyMarket')
-            elif values['text'] in self.users:
+            elif test.group(2) in self.users:
                 numCredits = db.checkBal(self.server, values['text'])
                 if type(numCredits) is not int:
                     numCredits = 15
                 form = 'credit.' if numCredits is 1 else 'credits.'
                 self.irc.send(
-                    'PRIVMSG', values['target'], ':' + values['text'], 
+                    'PRIVMSG', values['target'], ':' + test.group(2), 
                     'has', str(numCredits), form)
                 
 
