@@ -5,7 +5,7 @@ servers.append({
     'url': 'irc.freenode.net',
     'port': 6667,
     'nick': 'PyMarket',
-    'channels': '#learnprogramming,#lpmc'
+    'channels': '#learnprogramming,#lpmc,#reddit'
 })
 
 servers.append({
