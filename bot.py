@@ -96,8 +96,8 @@ class Pymarket:
                         'PRIVMSG', values['target'], 
                         ':' + values['nick'] + ': Not enough credits.')
 
-        # Checks to see if the help command is issued and responds accordingly.
-        test = re.match(r'(\w+)[:,]? (\w+)', values['text'])
+        # Checks for commands and responds accordingly.
+        test = re.match(r'(\w+)[:,]? (.+)', values['text'])
         if test and test.group(1) == self.irc.name: 
             if test.group(2) == 'help':
                 self.irc.send(
