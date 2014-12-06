@@ -110,14 +110,14 @@ class Pymarket:
             elif 'source' in values['text']:
                 self.irc.send('PRIVMSG', values['target'],
                     ':' + 'https://github.com/garrettoreilly/PyMarket')
-            elif 'credits' in values['text']:
-                numCredits = db.checkBal(self.server, values['nick'])
+            elif values['text'] in self.users:
+                numCredits = db.checkBal(self.server, values['text'])
                 if type(numCredits) is not int:
                     numCredits = 15
                 form = 'credit.' if numCredits is 1 else 'credits.'
                 self.irc.send(
-                    'PRIVMSG', values['target'], ':' + values['nick'] + ':', 
-                    'You have', str(numCredits), form)
+                    'PRIVMSG', values['target'], ':' + values['text'], 
+                    'has', str(numCredits), form)
                 
 
     # Responds to requests for credit checks.
