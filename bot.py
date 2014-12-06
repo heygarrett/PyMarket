@@ -1,4 +1,4 @@
-import re, irc, db, threading, config, datetime
+import sys, re, irc, db, threading, config, datetime
 
 class Pymarket:
 
@@ -151,13 +151,16 @@ class Pymarket:
             self.users.add(re.match('^[~&@%+]?(.+)$', nick).group(1))
 
 def main():
+    if len(sys.argv) < 2:
+        print("No arguments.")
+        sys.exit()
     # Print timestamp before each line.
     def currentTime():
         return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     # Starts the bot and puts it in a receiving loop.
     def startBot(bot):
-        bot.irc.connect()
+        bot.irc.connect(sys.argv[1])
         while True:
             lines = bot.irc.receive()
             for text in lines:

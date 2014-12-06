@@ -10,8 +10,9 @@ class Irc:
         self.buf = b''
         self.client = socket.socket()
 
-    def connect(self):
+    def connect(self, password):
         self.client.connect((self.host, self.port))
+        self.send('PASS', password)
         self.send('NICK', self.name)
         self.send('USER', self.name, '8', '*', self.name)
         self.send('JOIN', self.channel)
