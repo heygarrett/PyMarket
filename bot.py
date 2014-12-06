@@ -99,23 +99,23 @@ class Pymarket:
         # Checks for commands and responds accordingly.
         test = re.match(r'(\w+)[:,]? (.+)', values['text'])
         if test and test.group(1) == self.irc.name: 
-            if test.group(2) == 'help':
+            if test.group(2).strip() == 'help':
                 self.irc.send(
                     'PRIVMSG', values['target'], 
                     ':' + '\"<nick>+=X\" will transfer X credits to <nick>.')
                 self.irc.send(
                     'PRIVMSG', values['target'], 
                     ':' + '\"PyMarket: <nick>\" will display <nick>\'s credits.')
-            elif test.group(2) == 'source':
+            elif test.group(2).strip() == 'source':
                 self.irc.send('PRIVMSG', values['target'],
                     ':' + 'https://github.com/garrettoreilly/PyMarket')
-            elif test.group(2) in self.users:
-                numCredits = db.checkBal(self.server, test.group(2))
+            elif test.group(2).strip() in self.users:
+                numCredits = db.checkBal(self.server, test.group(2).strip())
                 if type(numCredits) is not int:
                     numCredits = 15
                 form = 'credit.' if numCredits is 1 else 'credits.'
                 self.irc.send(
-                    'PRIVMSG', values['target'], ':' + test.group(2), 
+                    'PRIVMSG', values['target'], ':' + test.group(2).strip(), 
                     'has', str(numCredits), form)
                 
 
