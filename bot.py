@@ -110,6 +110,14 @@ class Pymarket:
             elif 'source' in values['text']:
                 self.irc.send('PRIVMSG', values['target'],
                     ':' + 'https://github.com/garrettoreilly/PyMarket')
+            elif 'credits' in values['text']:
+                numCredits = db.checkBal(self.server, values['nick'])
+                if type(numCredits) is not int:
+                    numCredits = 15
+                self.irc.send(
+                    'PRIVMSG', values['target'], ':' + values['text'], 
+                    ': You have', str(numCredits), 'credits.')
+                
 
     # Responds to requests for credit checks.
     def notice(self, values):
