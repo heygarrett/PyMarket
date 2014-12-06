@@ -105,13 +105,12 @@ class Pymarket:
                     ':' + '\"<nick>+=X\" will transfer X credits to <nick>.')
                 self.irc.send(
                     'PRIVMSG', values['target'], 
-                    ':' + 'PM or NOTICE PyMarket with '
-                    '<nick> to see <nick>\'s credits.')
+                    ':' + '\"PyMarket: <nick>\" will display <nick>\'s credits.')
             elif test.group(2) == 'source':
                 self.irc.send('PRIVMSG', values['target'],
                     ':' + 'https://github.com/garrettoreilly/PyMarket')
             elif test.group(2) in self.users:
-                numCredits = db.checkBal(self.server, values['text'])
+                numCredits = db.checkBal(self.server, values['test.group(2)'])
                 if type(numCredits) is not int:
                     numCredits = 15
                 form = 'credit.' if numCredits is 1 else 'credits.'
