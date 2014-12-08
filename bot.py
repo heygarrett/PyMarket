@@ -105,7 +105,7 @@ class Pymarket:
                     'has', str(numCredits), form)
             else:
                 subreddits = []
-                for word in values['text']:
+                for word in commandList:
                     if 'r/' in word and word not in subreddits:
                         subreddits.append(word)
                 for word in subreddits:
