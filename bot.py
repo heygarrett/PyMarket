@@ -62,20 +62,6 @@ class Pymarket:
         except:
             return
 
-        subreddits = []
-        for word in commandList:
-            if 'r/' in word and word not in subreddits:
-                subreddits.append(word)
-        for word in subreddits:
-            if word.find('/r/') is 0 and len(word) > 3:
-                self.irc.send(
-                        'PRIVMSG', values['target'],
-                        ':' + 'https://reddit.com' + word)
-            elif word.find('r/') is 0 and len(word) > 2:
-                self.irc.send(
-                        'PRIVMSG', values['target'],
-                        ':' + 'https://reddit.com/' + word)
-
         # Creates transaction when the transaction syntax is recognized.
         if '+=' in command:
             rcv, credits = command.split('+=', 1)
@@ -117,7 +103,20 @@ class Pymarket:
                 self.irc.send(
                     'PRIVMSG', values['target'], ':' + test.group(2).strip(), 
                     'has', str(numCredits), form)
-                
+            else:
+                subreddits = []
+                for word in values['text']:
+                    if 'r/' in word and word not in subreddits:
+                        subreddits.append(word)
+                for word in subreddits:
+                    if word.find('/r/') is 0 and len(word) > 3:
+                        self.irc.send(
+                                'PRIVMSG', values['target'],
+                                ':' + 'https://reddit.com' + word)
+                    elif word.find('r/') is 0 and len(word) > 2:
+                        self.irc.send(
+                                'PRIVMSG', values['target'],
+                                ':' + 'https://reddit.com/' + word)
 
     # Responds to requests for credit checks.
     def notice(self, values):
