@@ -159,9 +159,6 @@ class Pymarket:
             self.users.add(re.match('^[~&@%+]?(.+)$', nick).group(1))
 
 def main():
-    if len(sys.argv) < 2:
-        print("No arguments.")
-        sys.exit()
     # Print timestamp before each line.
     def currentTime():
         return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
